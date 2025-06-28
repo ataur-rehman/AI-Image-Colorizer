@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- CSS and other head elements remain unchanged -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRISMIFY Canvas Image Editor</title>
+  <style>
+    /* All CSS styles remain unchanged */
+    :root {
+      --primary: #994b3a;
+      --primary-hover: #bb5f4c;
+      --primary-light: rgba(153, 75, 58, 0.2);
+      --bg-dark: #1e1e1e;
+      --component-bg: #2e2e2e;
+      --text-light: #ffffff;
+      --text-muted: #bbbbbb;
+      --border-radius: 12px;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    h2 {
+      color: var(--primary);
+      margin-bottom: 20px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .note {
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      text-align: center;
+      background-color: var(--primary-light);
+      padding: 10px 15px;
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      max-width: 500px;
+    }
+
+    .editor-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 800px;
+      gap: 20px;
+    }
+
+    .editor {
+      background-color: var(--component-bg);
+      border: 2px solid var(--primary);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .canvas-container {
+      position: relative;
+      margin-bottom: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    canvas {
+      border: 1px solid #555;
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+
+    .file-input-wrapper label {
+      display: block;
+      background: var(--primary);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      font-weight: 500;
+      width: 100%;
+    }
+
+    .file-input-wrapper label:hover {
+      background: var(--primary-hover);
+    }
+
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .slider-group {
+      margin-bottom: 18px;
+      width: 100%;
+    }
+
+    .slider-group label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
+
+    .slider-group label span {
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 5px;
+      border-radius: 5px;
+      appearance: none;
+      background: #555;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--primary-hover);
+      transform: scale(1.2);
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    #save {
+      background-color: #105a10;
+      grid-column: span 2;
+    }
+
+    #save:hover {
+      background-color: #1a7a1a;
+    }
+
+    .loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 8px;
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .loading.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #333;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.5s;
+      z-index: 1000;
+    }
+
+    .toast.success {
+      background-color: #2e7d32;
+      border-left: 4px solid #1b5e20;
+    }
+
+    .toast.error {
+      background-color: #c62828;
+      border-left: 4px solid #b71c1c;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    
+#preview {
+  background-color: #b7513d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  max-width: 200px;
+  transition: var(--transition);
+  border-radius: var(--border-radius);
+  text-align: center;
+   margin-bottom: 10px; 
+}
+
+#preview:hover {
+  background-color: #c26c5b;
+}
+
+#preview:active {
+  background-color: #b05745;
+}
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (min-width: 768px) {
+      .editor-container {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+
+      .canvas-container {
+        flex: 1;
+        max-width: 60%;
+      }
+
+      .editor {
+        flex: 1;
+        max-width: 350px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <input type="hidden" id="image_url" value="{{ image.edited_image.url }}">
+  <input type="hidden" id="image_id" value="{{ image.id }}">
+
+  <h2>Canvas Image Editor</h2>
+      <div class="preview-control">
+  <button id="preview" title="Hold to preview original image">
+    Preview
+  </button>
+</div>
+
+  <div class="editor-container">
+    <div class="canvas-container">
+      <canvas id="canvas"></canvas>
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <div class="editor">
+      <div class="file-input-wrapper">
+       
+        <input type="file" id="upload" accept="image/*" />
+      </div>
+
+      <div class="slider-group">
+        <label for="brightness">Brightness <span id="brightness-value">0</span></label>
+        <input type="range" min="-100" max="100" value="0" id="brightness" />
+      </div>
+
+      <div class="slider-group">
+        <label for="contrast">Contrast <span id="contrast-value">0</span></label>
+        <input type="range" min="-100" max="100" value="0" id="contrast" />
+      </div>
+
+      <div class="slider-group">
+        <label for="grayscale">Grayscale <span id="grayscale-value">0%</span></label>
+        <input type="range" min="0" max="100" value="0" id="grayscale" />
+      </div>
+
+      <div class="slider-group">
+        <label for="sepia">Sepia <span id="sepia-value">0%</span></label>
+        <input type="range" min="0" max="100" value="0" id="sepia" />
+      </div>
+
+      <div class="button-group">
+        <button id="invert">Invert</button>
+        <button id="sharpen">Sharpen</button>
+        <button id="blur">Blur</button>
+        <button id="reset">Reset</button>
+        <button id="save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const upload = document.getElementById("upload");
+      const loading = document.getElementById("loading");
+      const toast = document.getElementById("toast");
+
+      // Get slider value displays
+      const brightnessValue = document.getElementById("brightness-value");
+      const contrastValue = document.getElementById("contrast-value");
+      const grayscaleValue = document.getElementById("grayscale-value");
+      const sepiaValue = document.getElementById("sepia-value");
+
+      let originalImage = null;
+      let currentImageData = null;
+
+      // Show toast message
+      function showToast(message, type = "success") {
+        toast.textContent = message;
+        toast.className = `toast ${type} show`;
+        
+        setTimeout(() => {
+          toast.className = toast.className.replace("show", "");
+        }, 3000);
+      }
+
+      // Show loading indicator
+      function showLoading() {
+        loading.classList.add("active");
+      }
+
+      // Hide loading indicator
+      function hideLoading() {
+        loading.classList.remove("active");
+      }
+
+      // Load image from server
+      function loadImage() {
+        const url = document.getElementById("image_url").value;
+        if (!url) return;
+        
+        showLoading();
+        
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = () => {
+          // Set canvas dimensions based on image, with a maximum width/height
+          const maxDimension = 600;
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > height && width > maxDimension) {
+            height = (height * maxDimension) / width;
+            width = maxDimension;
+          } else if (height > maxDimension) {
+            width = (width * maxDimension) / height;
+            height = maxDimension;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          originalImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          currentImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          hideLoading();
+        };
+        img.onerror = () => {
+          hideLoading();
+          showToast("Failed to load image. Please try again.", "error");
+        };
+        img.src = url;
+      }
+
+      // Run on page load
+      loadImage();
+
+      // Handle file upload
+      upload.addEventListener("change", function() {
+        if (this.files && this.files[0]) {
+          showLoading();
+          
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+              // Set canvas dimensions based on image, with a maximum width/height
+              const maxDimension = 600;
+              let width = img.width;
+              let height = img.height;
+              
+              if (width > height && width > maxDimension) {
+                height = (height * maxDimension) / width;
+                width = maxDimension;
+              } else if (height > maxDimension) {
+                width = (width * maxDimension) / height;
+                height = maxDimension;
+              }
+              
+              canvas.width = width;
+              canvas.height = height;
+              
+              ctx.drawImage(img, 0, 0, width, height);
+              originalImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              currentImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              hideLoading();
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+
+      // Update slider value displays
+      const sliders = ["brightness", "contrast", "grayscale", "sepia"];
+      sliders.forEach(id => {
+        const slider = document.getElementById(id);
+        const valueDisplay = document.getElementById(`${id}-value`);
+        
+        slider.addEventListener("input", () => {
+          if (id === "grayscale" || id === "sepia") {
+            valueDisplay.textContent = `${slider.value}%`;
+          } else {
+            valueDisplay.textContent = slider.value;
+          }
+          applyFilters();
+        });
+      });
+
+      // Reset button
+      document.getElementById("reset").addEventListener("click", () => {
+        sliders.forEach(id => {
+          const slider = document.getElementById(id);
+          slider.value = id === "brightness" || id === "contrast" ? 0 : 0;
+          const valueDisplay = document.getElementById(`${id}-value`);
+          if (id === "grayscale" || id === "sepia") {
+            valueDisplay.textContent = "0%";
+          } else {
+            valueDisplay.textContent = "0";
+          }
+        });
+        
+        if (originalImage) {
+          currentImageData = new ImageData(
+            new Uint8ClampedArray(originalImage.data),
+            originalImage.width,
+            originalImage.height
+          );
+          ctx.putImageData(originalImage, 0, 0);
+        }
+      });
+
+      // Apply all filters
+      function applyFilters() {
+        if (!originalImage) return;
+        
+        // Start with a fresh copy of the original image
+        const imageData = new ImageData(
+          new Uint8ClampedArray(originalImage.data),
+          originalImage.width,
+          originalImage.height
+        );
+        const data = imageData.data;
+
+        const brightness = parseInt(document.getElementById("brightness").value);
+        const contrast = parseInt(document.getElementById("contrast").value);
+        const grayscale = parseInt(document.getElementById("grayscale").value);
+        const sepia = parseInt(document.getElementById("sepia").value);
+
+        const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+        for (let i = 0; i < data.length; i += 4) {
+          // Brightness + Contrast
+          for (let j = 0; j < 3; j++) {
+            let val = data[i + j];
+            val = factor * (val - 128) + 128; // contrast
+            val += brightness; // brightness
+            data[i + j] = Math.max(0, Math.min(255, val));
+          }
+
+          // Grayscale
+          if (grayscale > 0) {
+            const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+            for (let j = 0; j < 3; j++) {
+              data[i + j] = data[i + j] * (100 - grayscale) / 100 + avg * grayscale / 100;
+            }
+          }
+
+          // Sepia
+          if (sepia > 0) {
+            const r = data[i], g = data[i + 1], b = data[i + 2];
+            data[i]     = Math.min(255, r * (1 - 0.607 * sepia / 100) + g * 0.769 * sepia / 100 + b * 0.189 * sepia / 100);
+            data[i + 1] = Math.min(255, r * 0.349 * sepia / 100 + g * (1 - 0.314 * sepia / 100) + b * 0.168 * sepia / 100);
+            data[i + 2] = Math.min(255, r * 0.272 * sepia / 100 + g * 0.534 * sepia / 100 + b * (1 - 0.869 * sepia / 100));
+          }
+        }
+
+        currentImageData = imageData;
+        ctx.putImageData(imageData, 0, 0);
+      }
+
+      // Invert button
+      document.getElementById("invert").addEventListener("click", () => {
+        if (!currentImageData) return;
+        
+        showLoading();
+        setTimeout(() => {
+          const imageData = new ImageData(
+            new Uint8ClampedArray(currentImageData.data),
+            currentImageData.width,
+            currentImageData.height
+          );
+          const data = imageData.data;
+
+          for (let i = 0; i < data.length; i += 4) {
+            data[i]     = 255 - data[i];     // Red
+            data[i + 1] = 255 - data[i + 1]; // Green
+            data[i + 2] = 255 - data[i + 2]; // Blue
+          }
+
+          currentImageData = imageData;
+          ctx.putImageData(imageData, 0, 0);
+          hideLoading();
+        }, 100);
+      });
+
+      // Sharpen button
+      document.getElementById("sharpen").addEventListener("click", () => {
+        if (!currentImageData) return;
+        
+        showLoading();
+        setTimeout(() => {
+          const weights = [
+            0, -1, 0,
+            -1, 5, -1,
+            0, -1, 0
+          ];
+          applyConvolution(weights);
+          hideLoading();
+        }, 100);
+      });
+
+      // Blur button
+      document.getElementById("blur").addEventListener("click", () => {
+        if (!currentImageData) return;
+        
+        showLoading();
+        setTimeout(() => {
+          const weights = [
+            1, 1, 1,
+            1, 1, 1,
+            1, 1, 1
+          ];
+          applyConvolution(weights, true);
+          hideLoading();
+        }, 100);
+      });
+
+            // Preview original image (show while button is pressed)
+const previewBtn = document.getElementById("preview");
+previewBtn.addEventListener("mousedown", () => {
+  if (originalImage) {
+    // Save current state before preview
+    const tempImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    
+    // Show original image
+    ctx.putImageData(originalImage, 0, 0);
+    
+    // Function to restore when button is released
+    const restoreImage = () => {
+      ctx.putImageData(tempImageData, 0, 0);
+      document.removeEventListener("mouseup", restoreImage);
+      previewBtn.removeEventListener("mouseleave", restoreImage);
+    };
+    
+    // Restore on mouse up or when cursor leaves the button
+    document.addEventListener("mouseup", restoreImage);
+    previewBtn.addEventListener("mouseleave", restoreImage);
+  }
+});
+
+// Add touch support for mobile devices
+previewBtn.addEventListener("touchstart", (e) => {
+  e.preventDefault(); // Prevent default touch behavior
+  if (originalImage) {
+    // Save current state before preview
+    const tempImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    
+    // Show original image
+    ctx.putImageData(originalImage, 0, 0);
+    
+    // Function to restore when touch ends
+    const restoreImage = () => {
+      ctx.putImageData(tempImageData, 0, 0);
+      document.removeEventListener("touchend", restoreImage);
+      document.removeEventListener("touchcancel", restoreImage);
+    };
+    
+    // Restore on touch end or cancel
+    document.addEventListener("touchend", restoreImage);
+    document.addEventListener("touchcancel", restoreImage);
+  }
+});
+
+
+      // Apply convolution (for effects like sharpen, blur)
+      function applyConvolution(weights, isBlur = false) {
+        const side = 3;
+        const half = Math.floor(side / 2);
+        const kernelWeight = weights.reduce((a, b) => a + b, 0) || 1;
+
+        const src = currentImageData || ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const output = ctx.createImageData(canvas.width, canvas.height);
+
+        const data = src.data;
+        const outputData = output.data;
+
+        // Process image with convolution
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            for (let c = 0; c < 3; c++) {
+              let sum = 0;
+              for (let ky = 0; ky < side; ky++) {
+                for (let kx = 0; kx < side; kx++) {
+                  const px = x + kx - half;
+                  const py = y + ky - half;
+                  if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
+                    const offset = ((py * canvas.width) + px) * 4;
+                    sum += data[offset + c] * weights[ky * side + kx];
+                  }
+                }
+              }
+              const index = (y * canvas.width + x) * 4;
+              outputData[index + c] = isBlur ? sum / kernelWeight : Math.min(Math.max(sum, 0), 255);
+            }
+            // Alpha channel (preserve transparency)
+            outputData[(y * canvas.width + x) * 4 + 3] = data[(y * canvas.width + x) * 4 + 3];
+          }
+        }
+
+        currentImageData = output;
+        ctx.putImageData(output, 0, 0);
+      }
+
+      // Save image - FIXED URL PATH AND RESPONSE HANDLING
+      document.getElementById("save").addEventListener("click", () => {
+        const imageId = document.getElementById("image_id").value;
+        if (!imageId) {
+          showToast("Error: No image ID found", "error");
+          return;
+        }
+
+        showLoading();
+        const dataURL = canvas.toDataURL("image/png");
+
+        // FIXED: URL path now matches Django URL pattern
+        fetch(`/save-edited/${imageId}/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken(),
+          },
+          body: JSON.stringify({
+            image: dataURL,
+            image_id: imageId
+          }),
+        })
+        .then((res) => res.json())
+        .then((data) => {
+          hideLoading();
+          // FIXED: Response handling now matches Django view response format
+          if (data.message === "Image saved successfully") {
+            showToast("Image saved successfully!");
+          } else {
+            showToast("Failed to save image: " + data.message, "error");
+          }
+        })
+        .catch((err) => {
+          hideLoading();
+          console.error("Save error:", err);
+          showToast("Error saving image. Please try again.", "error");
+        });
+      });
+
+      // Get CSRF token from cookies
+      function getCSRFToken() {
+        const name = "csrftoken";
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const c = cookies[i].trim();
+          if (c.startsWith(name + '=')) {
+            return decodeURIComponent(c.substring(name.length + 1));
+          }
+        }
+        return '';
+      }
+    });
+  </script>
+</body>
+</html>

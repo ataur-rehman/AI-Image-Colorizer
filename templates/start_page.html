@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prismify - Our Strategy</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #222;
+    }
+    
+    .logo img {
+      height: 50px;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 30px;
+    }
+    
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 16px;
+      transition: color 0.3s;
+    }
+    
+    .nav-links a:hover {
+      color: #e45435;
+    }
+    
+    .hero {
+      text-align: center;
+      padding: 80px 0;
+    }
+    
+    .hero h1 {
+      font-size: 42px;
+      margin-bottom: 20px;
+    }
+    
+    .highlight {
+      color: #e45435;
+    }
+    
+    .hero p {
+      font-size: 18px;
+      color: #aaa;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    .strategy-section {
+      padding: 60px 0;
+      border-bottom: 1px solid #222;
+    }
+    
+    .section-title {
+      font-size: 28px;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+    }
+    
+    .feature-card {
+      background-color: #111;
+      border-radius: 15px;
+      padding: 30px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(228, 84, 53, 0.2);
+    }
+    
+    .feature-icon {
+      font-size: 36px;
+      color: #e45435;
+      margin-bottom: 20px;
+    }
+    
+    .feature-title {
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+    
+    .feature-desc {
+      color: #aaa;
+      line-height: 1.5;
+    }
+    
+    .cta-section {
+      text-align: center;
+      padding: 80px 0;
+    }
+    
+    .btn {
+      background-color: #e45435;
+      color: #fff;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
+      background-color: #d13e25;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      color: #aaa;
+      font-size: 14px;
+    }
+    
+    .footer a {
+      color: #e45435;
+      text-decoration: none;
+    }
+    
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 40px 0;
+    }
+    
+    .comparison-table th {
+      background-color: #111;
+      color: #e45435;
+      padding: 15px;
+      text-align: left;
+    }
+    
+    .comparison-table td {
+      padding: 15px;
+      border-bottom: 1px solid #222;
+    }
+    
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .pricing-cards {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 40px 0;
+      flex-wrap: wrap;
+    }
+    
+    .pricing-card {
+      background-color: #111;
+      border-radius: 15px;
+      padding: 30px;
+      width: 300px;
+      text-align: center;
+    }
+    
+    .pricing-card.featured {
+      border: 2px solid #e45435;
+    }
+    
+    .plan-name {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    
+    .plan-price {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    
+    .plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 30px 0;
+      text-align: left;
+    }
+    
+    .plan-features li {
+      padding: 10px 0;
+      border-bottom: 1px solid #222;
+    }
+    
+    .plan-features li:last-child {
+      border-bottom: none;
+    }
+    
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .pricing-cards {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  {% load static %}
+  
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <img src="{% static 'logo.jpg' %}" alt="Prismify Logo">
+      </div>
+      <nav class="nav-links">
+
+        <a href="{% url 'login' %}">Sign In</a>
+      </nav>
+    </header>
+    
+    <section class="hero">
+      <h1>Our <span class="highlight">Strategy</span> for Perfect Colorization</h1>
+      <p>Discover how our AI-powered technology brings black and white images to life with stunning color accuracy and professional editing features.</p>
+    </section>
+    
+    <section class="strategy-section">
+      <h2 class="section-title">How <span class="highlight">Prismify</span> Works</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🧠</div>
+          <h3 class="feature-title">Advanced AI Technology</h3>
+          <p class="feature-desc">Our proprietary deep learning models have been trained on millions of images to understand color relationships and natural patterns.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3 class="feature-title">Precise Color Mapping</h3>
+          <p class="feature-desc">We analyze image content and context to apply historically accurate and visually pleasing colors to your black and white photos.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3 class="feature-title">Lightning Fast Processing</h3>
+          <p class="feature-desc">Our optimized algorithms colorize your images in seconds, not minutes, without sacrificing quality or detail.</p>
+        </div>
+      </div>
+    </section>
+    
+    <section class="strategy-section">
+      <h2 class="section-title">Professional <span class="highlight">Editing Tools</span></h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">💡</div>
+          <h3 class="feature-title">Brightness Control</h3>
+          <p class="feature-desc">Fine-tune the luminosity of your colorized images with our intuitive brightness slider for perfect exposure.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✨</div>
+          <h3 class="feature-title">Smart Sharpening</h3>
+          <p class="feature-desc">Enhance details without introducing noise using our intelligent sharpening algorithm designed for vintage photos.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <h3 class="feature-title">Color Inversion</h3>
+          <p class="feature-desc">Create artistic negative effects or correct negative scans with our one-click inversion feature.</p>
+        </div>
+      </div>
+    </section>
+    
+    <section class="strategy-section">
+      <h2 class="section-title">Why Choose <span class="highlight">Prismify</span>?</h2>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Prismify</th>
+            <th>Competitors</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>AI Colorization Accuracy</td>
+            <td>99% natural-looking results</td>
+            <td>Often produces unnatural hues</td>
+          </tr>
+          <tr>
+            <td>Processing Speed</td>
+            <td>Under 5 seconds per image</td>
+            <td>30+ seconds per image</td>
+          </tr>
+          <tr>
+            <td>Advanced Editing Tools</td>
+            <td>Full suite included</td>
+            <td>Limited or premium add-ons</td>
+          </tr>
+          <tr>
+            <td>Historical Color Accuracy</td>
+            <td>Trained on period-specific data</td>
+            <td>Generic color mapping</td>
+          </tr>
+          <tr>
+            <td>Batch Processing</td>
+            <td>Up to 100 images at once</td>
+            <td>Usually limited to 5-10 images</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    
+    <section class="strategy-section">
+      <h2 class="section-title">Pricing <span class="highlight">Plans</span></h2>
+      <div class="pricing-cards">
+        <div class="pricing-card">
+          <h3 class="plan-name">Basic</h3>
+          <div class="plan-price">$0</div>
+          <ul class="plan-features">
+            <li>Up to 5 images per day</li>
+            <li>Standard colorization</li>
+            <li>Basic editing tools</li>
+            <li>720p max resolution</li>
+          </ul>
+        
+        </div>
+        <div class="pricing-card featured">
+          <h3 class="plan-name">Pro</h3>
+          <div class="plan-price">$9.99/mo</div>
+          <ul class="plan-features">
+            <li>Unlimited images</li>
+            <li>Premium colorization</li>
+            <li>Full editing suite</li>
+            <li>4K max resolution</li>
+            <li>Batch processing</li>
+          </ul>
+      
+        </div>
+        <div class="pricing-card">
+          <h3 class="plan-name">Business</h3>
+          <div class="plan-price">$29.99/mo</div>
+          <ul class="plan-features">
+            <li>Everything in Pro</li>
+            <li>API access</li>
+            <li>Priority processing</li>
+            <li>Dedicated support</li>
+            <li>Commercial usage rights</li>
+          </ul>
+         
+        </div>
+      </div>
+    </section>
+    
+    <section class="cta-section">
+      <h2 class="section-title">Ready to Bring Your <span class="highlight">Photos to Life</span>?</h2>
+      <a href="{% url 'signup' %}">
+        <button class="btn">GET STARTED NOW</button>
+      </a>
+    </section>
+    
+    <footer class="footer">
+      <p>© 2025 Prismify. All rights reserved.</p>
+      <p>ALREADY HAVE AN ACCOUNT? <a href="{% url 'login' %}">SIGN IN</a></p>
+    </footer>
+  </div>
+</body>
+</html>

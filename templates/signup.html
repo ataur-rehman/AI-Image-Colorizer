@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prismify - Signup</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .highlight {
+      color: #e45435;
+    }
+
+    form {
+      width: 100%;
+      max-width: 400px;
+      background-color: #111;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(206, 108, 79, 0.2);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      background-color: #222;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 15px;
+      transition: background 0.3s, border 0.3s;
+    }
+
+    input:focus {
+      background-color: #1a1a1a;
+      border-color: #e45435;
+      outline: none;
+    }
+
+    label {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    button[type="submit"] {
+      background-color: #e45435;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      margin-top: 20px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 100%;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #e45435;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      color: #ce6c4f;
+      font-size: 14px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    a {
+      color: #ce6c4f;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h2>Create <span class="highlight">Account</span></h2>
+
+  {% if messages %}
+    <ul>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <div style="margin-top: 15px; text-align: center;">
+    Already have an account? <a href="{% url 'login' %}">Log in</a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,987 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PRISMIFY - Colorized Result</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #ff6b4a;
+      --primary-dark: #e45435;
+      --primary-light: #ffebe7;
+      --bg-dark: #1a1a1a;
+      --bg-darker: #0d0d0d;
+      --bg-light: #2a2a2a;
+      --text-light: #ffffff;
+      --text-muted: #b0b0b0;
+      --border-radius: 12px;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-darker);
+      color: var(--text-light);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .header {
+      background-color: var(--bg-dark);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .nav-link {
+      color: var(--text-light);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+      padding: 0.5rem 0;
+    }
+    
+    .nav-link:hover {
+      color: var(--primary-color);
+    }
+    
+    .nav-link.active {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+    }
+    
+    .result-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .result-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: fadeIn 0.5s ease forwards;
+    }
+    
+    .result-header h1 {
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+    
+    .result-header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    
+    .comparison-container {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeIn 0.8s ease forwards;
+      position: relative;
+    }
+    
+    .image-card {
+      background-color: var(--bg-dark);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      flex: 1;
+      min-width: 300px;
+      max-width: 500px;
+      transition: var(--transition);
+      position: relative;
+    }
+    
+    .image-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    
+    .image-header {
+      padding: 1rem;
+      background-color: rgba(0, 0, 0, 0.2);
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .image-header .tag {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .image-content {
+      padding: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .image-preview {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      border-radius: 8px;
+      max-height: 400px;
+      transition: filter 0.5s ease;
+    }
+    
+    .colorize-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 5;
+    }
+    
+    .colorize-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .colorize-animation {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+    
+    .colorize-preview {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      width: calc(100% - 2rem);
+      height: calc(100% - 2rem);
+      object-fit: contain;
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity 1s ease;
+      z-index: 1;
+      display: none; /* Hide by default */
+    }
+    
+    .colorize-preview.show {
+      opacity: 1;
+      display: block; /* Show only when needed */
+    }
+    
+    .actions {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      animation: fadeIn 1s ease forwards;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-light);
+      background: linear-gradient(145deg, var(--primary-color), var(--primary-dark));
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(255, 107, 74, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+      opacity: 0;
+      transform: scale(0);
+      transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(255, 107, 74, 0.35);
+    }
+    
+    .btn:hover::before {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    .btn:active {
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+    
+    .btn-secondary:hover {
+      background: #3a3a3a;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+    }
+    
+    .message-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      max-width: 400px;
+    }
+    
+    .alert {
+      padding: 1rem;
+      margin: 10px 0;
+      border-radius: var(--border-radius);
+      position: relative;
+      animation: slideIn 0.3s ease-out;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+    
+    .alert-error {
+      background-color: #3f1d1d;
+      color: #ff8a8a;
+      border-left: 4px solid #ff4d4d;
+    }
+    
+    .alert-success {
+      background-color: #1e3424;
+      color: #9cffaf;
+      border-left: 4px solid #2ecc71;
+    }
+    
+    .alert-info {
+      background-color: #1d2b3f;
+      color: #8abaff;
+      border-left: 4px solid #3498db;
+    }
+    
+    .close-btn {
+      cursor: pointer;
+      margin-left: 15px;
+      font-weight: bold;
+      opacity: 0.7;
+      transition: var(--transition);
+    }
+    
+    .close-btn:hover {
+      opacity: 1;
+    }
+    
+    /* Enhanced animation elements */
+    .color-particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 20;
+      perspective: 800px;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      opacity: 0;
+      transform: scale(0) translateZ(0);
+      filter: blur(1px);
+      box-shadow: 0 0 12px 3px rgba(255, 107, 74, 0.4);
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+    }
+    
+    .color-wave {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      background: radial-gradient(circle, transparent 0%, transparent 100%);
+      opacity: 0;
+      z-index: 15;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      will-change: opacity, background;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    
+    .scan-line {
+      position: absolute;
+      width: 150%;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(255, 107, 74, 0.9), transparent);
+      top: 0;
+      left: -25%;
+      opacity: 0;
+      z-index: 17;
+      filter: blur(2px);
+      box-shadow: 0 0 15px 8px rgba(255, 107, 74, 0.4);
+      will-change: transform, opacity;
+      transform: translateZ(0);
+    }
+    
+    .color-splash {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background-size: 400% 400%;
+      background-image: linear-gradient(
+        45deg,
+        rgba(255, 107, 74, 0.7),
+        rgba(233, 30, 99, 0.7),
+        rgba(156, 39, 176, 0.7),
+        rgba(63, 81, 181, 0.7),
+        rgba(3, 169, 244, 0.7),
+        rgba(0, 150, 136, 0.7),
+        rgba(255, 193, 7, 0.7),
+        rgba(255, 87, 34, 0.7)
+      );
+      opacity: 0;
+      border-radius: 8px;
+      z-index: 14;
+      mix-blend-mode: color;
+      pointer-events: none;
+      will-change: background-position, opacity;
+      transform: translateZ(0);
+    }
+    
+    .color-burst {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background: radial-gradient(circle, rgba(255, 107, 74, 0.8) 0%, transparent 70%);
+      opacity: 0;
+      z-index: 13;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      transform: scale(0);
+      will-change: transform, opacity;
+      transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1), opacity 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    
+    .pixel-grid {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(255, 255, 255, 0.05) 4px, rgba(255, 255, 255, 0.05) 5px),
+        repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(255, 255, 255, 0.05) 4px, rgba(255, 255, 255, 0.05) 5px);
+      opacity: 0;
+      z-index: 13;
+      pointer-events: none;
+      transform: translateZ(0);
+    }
+    
+    .color-dust {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      opacity: 0;
+      filter: blur(0.5px);
+      z-index: 12;
+      transform: translateZ(0);
+    }
+    
+    /* Enhanced animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes particleAnimation {
+      0% {
+        transform: scale(0) translate3d(0, 0, 0) rotate(0deg);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(2) translate3d(var(--tx), var(--ty), var(--tz)) rotate(var(--rot));
+        opacity: 0;
+      }
+    }
+    
+    @keyframes waveEffect {
+      0% {
+        opacity: 0.5;
+        background: radial-gradient(circle, rgba(255, 107, 74, 0.8) 0%, transparent 0%);
+      }
+      100% {
+        opacity: 0;
+        background: radial-gradient(circle, rgba(255, 107, 74, 0) 70%, transparent 100%);
+      }
+    }
+    
+    @keyframes scanLine {
+      0% {
+        top: -4px;
+        opacity: 0;
+        transform: translateZ(0);
+      }
+      5% {
+        opacity: 0.9;
+      }
+      95% {
+        opacity: 0.9;
+      }
+      100% {
+        top: 100%;
+        opacity: 0;
+        transform: translateZ(0);
+      }
+    }
+    
+    @keyframes scanLine2 {
+      0% {
+        top: -4px;
+        opacity: 0;
+        transform: translateZ(0);
+      }
+      5% {
+        opacity: 0.7;
+      }
+      95% {
+        opacity: 0.7;
+      }
+      100% {
+        top: 100%;
+        opacity: 0;
+        transform: translateZ(0);
+      }
+    }
+    
+    @keyframes colorSplash {
+      0% {
+        background-position: 0% 50%;
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      90% {
+        opacity: 0.7;
+      }
+      100% {
+        background-position: 100% 50%;
+        opacity: 0;
+      }
+    }
+    
+    @keyframes pixelReveal {
+      0% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 0.7;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+    
+    @keyframes pulseEffect {
+      0% { transform: scale(1) translateZ(0); }
+      50% { transform: scale(1.05) translateZ(0); }
+      100% { transform: scale(1) translateZ(0); }
+    }
+    
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 8px 0px rgba(255, 107, 74, 0.5); }
+      50% { box-shadow: 0 0 25px 8px rgba(255, 107, 74, 0.9); }
+      100% { box-shadow: 0 0 8px 0px rgba(255, 107, 74, 0.5); }
+    }
+    
+    @keyframes spinner {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes colorDust {
+      0% {
+        opacity: 0.8;
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(var(--dtx), var(--dty), 0) scale(0);
+      }
+    }
+    
+    @keyframes imageFilters {
+      0% {
+        filter: grayscale(1) contrast(1);
+      }
+      50% {
+        filter: grayscale(0.5) contrast(1.1) saturate(1.2);
+      }
+      100% {
+        filter: grayscale(0) contrast(1.05) saturate(1.1);
+      }
+    }
+    
+    .spinner {
+      width: 70px;
+      height: 70px;
+      border: 5px solid rgba(255, 107, 74, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spinner 0.8s linear infinite, glowPulse 2s infinite;
+    }
+    
+    .before-after-label {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      z-index: 30;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .completion-message {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    
+    .completion-message.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .colored-text {
+      background: linear-gradient(90deg, #FF6B4A, #FF8E53);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+    }
+    
+
+  
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .comparison-container {
+        flex-direction: column;
+      }
+      
+      .header {
+        padding: 1rem;
+      }
+      
+      .nav-links {
+        gap: 1rem;
+      }
+      
+      .result-header h1 {
+        font-size: 2rem;
+      }
+      
+      .image-card {
+        min-width: 100%;
+      }
+      
+      .actions {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="{% url 'dashboard' %}" class="logo">PRISMIFY</a>
+    <div class="nav-links">
+      <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+      <a href="{% url 'photo_editor' %}" class="nav-link">Photo Editor</a>
+      <a href="{% url 'show_history' %}" class="nav-link">My Edits</a>
+    </div>
+  </header>
+  
+  <!-- Message Container -->
+  <div class="message-container" id="messageContainer">
+    {% for message in messages %}
+      <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
+        {{ message }}
+        <span class="close-btn" onclick="this.parentElement.remove()">&times;</span>
+      </div>
+    {% endfor %}
+  </div>
+  
+  <div class="result-container">
+    <div class="result-header">
+      <h1>Magic in Progress...</h1>
+      <p>Our AI is adding color to your black and white image. Watch the transformation happen!</p>
+    </div>
+    
+    <div class="comparison-container">
+      <div class="image-card" id="originalCard">
+        <div class="image-header">
+          <span>Original Image</span>
+          <span class="before-after-label" id="beforeLabel">BEFORE</span>
+        </div>
+        <div class="image-content">
+          <img src="{{ image.original_image.url }}" alt="Original Image" class="image-preview" id="originalImage">
+          <div class="colorize-overlay" id="originalOverlay">
+           <!-- <div class="spinner"></div> -->
+          </div>
+          <div class="colorize-animation" id="originalAnimation">
+            <div class="color-particles" id="particles"></div>
+            <div class="color-wave" id="colorWave"></div>
+            <div class="color-burst" id="colorBurst"></div>
+          </div>
+          <div class="scan-line" id="scanLine"></div>
+          <div class="color-splash" id="colorSplash"></div>
+          <div class="pixel-grid" id="pixelGrid"></div>
+          <img src="{{ image.edited_image.url }}" alt="Colorized Preview" class="colorize-preview" id="colorizedPreview">
+          <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="image-card" id="resultCard" style="display: none;">
+        <div class="image-header">
+          <span>Colorized Image</span>
+          <span class="tag">AI Enhanced</span>
+          <button type="button" class="btn btn-secondary" id="previewOriginalBtn">
+  <span>Preview</span>
+</button>
+     <span class="before-after-label" id="afterLabel">AFTER</span>
+        </div>
+        <div class="image-content">
+          <img src="{{ image.edited_image.url }}" alt="Colorized Image" class="image-preview">
+        </div>
+      </div>
+    </div>
+    
+<div class="actions" id="actionButtons" style="display: none;">
+  <a href="{{ image.edited_image.url }}" class="btn" download>
+    <span>💾 Download Colorized Image</span>
+  </a>
+  <a href="{% url 'photo_editor' %}" class="btn btn-secondary">📸 Edit Another Photo</a>
+  <a href="{% url 'show_history' %}" class="btn btn-secondary">🗃️ View All Edits</a>
+  <a href="{% url 'dashboard' %}" class="btn btn-secondary">🏠 Back to Dashboard</a>
+</div>
+    <div class="result-header completion-message" id="completionMessage">
+      <h1>Transformation <span class="colored-text">Complete!</span></h1>
+      <p>Your image has been successfully colorized using our advanced AI technology.</p>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Auto-remove messages after 5 seconds
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(alert => {
+        setTimeout(() => {
+          alert.style.opacity = '0';
+          alert.style.transform = 'translateX(100%)';
+          setTimeout(() => alert.remove(), 500);
+        }, 5000);
+      });
+      
+      // Elements
+      const originalCard = document.getElementById('originalCard');
+      const resultCard = document.getElementById('resultCard');
+      const actionButtons = document.getElementById('actionButtons');
+      const originalOverlay = document.getElementById('originalOverlay');
+      const colorWave = document.getElementById('colorWave');
+      const colorBurst = document.getElementById('colorBurst');
+      const particles = document.getElementById('particles');
+      const colorizedPreview = document.getElementById('colorizedPreview');
+      const scanLine = document.getElementById('scanLine');
+      const colorSplash = document.getElementById('colorSplash');
+      const pixelGrid = document.getElementById('pixelGrid');
+      const originalImage = document.getElementById('originalImage');
+      const beforeLabel = document.getElementById('beforeLabel');
+      const afterLabel = document.getElementById('afterLabel');
+      const progressContainer = document.getElementById('progressContainer');
+      const progressBar = document.getElementById('progressBar');
+      const completionMessage = document.getElementById('completionMessage');
+      
+      // Animation configuration - higher quality
+      const MAX_PARTICLES = 30;
+      const ANIMATION_DURATION = 4000; // 5 seconds total animation
+      const COLOR_PARTICLES = 150; // Total color dust particles
+      let activeParticles = 0;
+      let progress = 0;
+      let animationComplete = false;
+      
+      // Start automatic colorization process
+      setTimeout(() => {
+        startColorization();
+      },); // Small delay to ensure page is fully loaded
+      
+      function startColorization() {
+        // Show progress bar
+        progressContainer.style.opacity = '1';
+        //updateProgress(5);
+        
+        // Show labels
+        beforeLabel.style.opacity = '1';
+        
+        // Start animation sequence
+        originalOverlay.classList.add('active');
+        
+        // Show pixel grid with animation
+        setTimeout(() => {
+          pixelGrid.style.opacity = '0.5';
+          pixelGrid.style.animation = 'pixelReveal 3s ease-in-out forwards';
+         // updateProgress(10);
+        }, 500);
+        
+        // Create initial wave of particles
+        setTimeout(() => {
+          createInitialParticles();
+        //  updateProgress(20);
+        }, 1000);
+        
+        // Start first scan line
+        setTimeout(() => {
+          scanLine.style.opacity = '0';
+          scanLine.style.animation = 'scanLine 2.5s ease-in-out forwards';
+         // updateProgress(30);
+        }, 1500);
+        
+        // Create color dust effect
+        setTimeout(() => {
+          createColorDust();
+         // updateProgress(40);
+        }, 2000);
+        
+        // Hide overlay spinner
+        setTimeout(() => {
+          originalOverlay.classList.remove('active');
+         // updateProgress(50);
+          
+          // Apply filter transition to original image
+          originalImage.style.transition = 'filter 2.5s cubic-bezier(0.19, 1, 0.22, 1)';
+          originalImage.style.animation = 'imageFilters 2.5s forwards';
+          
+          // Start color burst effect
+          colorBurst.style.opacity = '0.6';
+          colorBurst.style.transform = 'scale(1.5)';
+          
+          // Create second wave of particles
+          setTimeout(() => {
+            createParticleWave();
+            //updateProgress(60);
+          }, 500);
+          
+          // Start second scan line
+          setTimeout(() => {
+            // Create a new scan line since the first one is already used
+            const scanLine2 = document.createElement('div');
+            scanLine2.classList.add('scan-line');
+            scanLine2.style.top = '-4px';
+            originalCard.querySelector('.image-content').appendChild(scanLine2);
+            
+            scanLine2.style.opacity = '0';
+            scanLine2.style.animation = 'scanLine2 2s ease-in-out forwards';
+           // updateProgress(70);
+          }, 800);
+          
+          // Start color splash effect
+          setTimeout(() => {
+            colorSplash.style.animation = 'colorSplash 3s ease-in-out forwards';
+            colorSplash.style.opacity = '1';
+           // updateProgress(80);
+          }, 1500);
+            // Show colorized preview
+            setTimeout(() => {
+            colorizedPreview.classList.add('show');
+          //  updateProgress(90);
+            }, 2000);
+
+            // Finalize animation and reveal result
+            setTimeout(() => {
+            originalCard.style.display = 'none';
+            resultCard.style.display = 'block';
+            actionButtons.style.display = 'flex';
+            completionMessage.classList.add('show');
+          //  updateProgress(100);
+            progressContainer.style.opacity = '0'; // Hide progress bar
+            }, 3000);
+          }, 2500);
+          }
+
+         
+
+          function createColorDust() {
+          for (let i = 0; i < COLOR_PARTICLES; i++) {
+            const dust = document.createElement('div');
+            dust.classList.add('color-dust');
+            dust.style.left = `${Math.random() * 100}%`;
+            dust.style.top = `${Math.random() * 100}%`;
+            dust.style.setProperty('--dtx', `${Math.random() * 200 - 100}px`);
+            dust.style.setProperty('--dty', `${Math.random() * 200 - 100}px`);
+            dust.style.animation = `colorDust 3s ease-out forwards ${Math.random()}s`;
+            originalCard.querySelector('.image-content').appendChild(dust);
+
+            dust.addEventListener('animationend', () => {
+            dust.remove();
+            });
+          }
+          }
+
+          function createParticleWave() {
+          for (let i = 0; i < MAX_PARTICLES; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.setProperty('--tx', `${Math.random() * 300 - 150}px`);
+            particle.style.setProperty('--ty', `${Math.random() * 300 - 150}px`);
+            particle.style.setProperty('--tz', `${Math.random() * 300 - 150}px`);
+            particle.style.setProperty('--rot', `${Math.random() * 360}deg`);
+            particle.style.animation = `particleAnimation 2.5s ease-out forwards ${Math.random()}s`;
+            particles.appendChild(particle);
+
+            particle.addEventListener('animationend', () => {
+            particle.remove();
+            });
+          }
+          }
+          // Preview original functionality
+const previewOriginalBtn = document.getElementById('previewOriginalBtn');
+const resultImage = resultCard.querySelector('.image-preview');
+let originalImageSrc = '{{ image.original_image.url }}';
+let colorizedImageSrc = '{{ image.edited_image.url }}';
+
+// Store original sources
+if (resultImage) {
+  colorizedImageSrc = resultImage.src;
+}
+
+// Preview original on button press
+if (previewOriginalBtn) {
+  previewOriginalBtn.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    if (resultImage) {
+      resultImage.src = originalImageSrc;
+    }
+  });
+  
+  previewOriginalBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (resultImage) {
+      resultImage.src = originalImageSrc;
+    }
+  });
+  
+  // Restore colorized image when button is released
+  previewOriginalBtn.addEventListener('mouseup', function() {
+    if (resultImage) {
+      resultImage.src = colorizedImageSrc;
+    }
+  });
+  
+  previewOriginalBtn.addEventListener('mouseleave', function() {
+    if (resultImage) {
+      resultImage.src = colorizedImageSrc;
+    }
+  });
+  
+  previewOriginalBtn.addEventListener('touchend', function() {
+    if (resultImage) {
+      resultImage.src = colorizedImageSrc;
+    }
+  });
+  
+  previewOriginalBtn.addEventListener('touchcancel', function() {
+    if (resultImage) {
+      resultImage.src = colorizedImageSrc;
+    }
+  });
+}
+        });
+        </script>
+
+
