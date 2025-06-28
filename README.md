@@ -11,16 +11,13 @@ The aim of Prismify is to simplify AI-driven image colorization for everyday use
 ---
 
 ## Screenshots
-  <div style="display: flex; justify-content: space-between; gap: 10px;">
-<img src="home.png" alt="Home Page" width="250" />
-<img src="signup.png" alt="SignUp Page" width="250" />
-<img src="dashboard.png" alt="Dashboard" width="250" />
-</div>
-
-<div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 20px;">
-<img src="upload.png" alt="Upload Page" width="250" />
-<img src="canvas.png" alt="Editing Page" width="250" />
-<img src="colorize.png" alt="Colorize Page" width="250" />
+  <div style="display: flex; justify-content: space-between; gap: 20px;">
+<img src="home.png" alt="Home Page" width="500" />
+<img src="signup.png" alt="SignUp Page" width="500" />
+<img src="dashboard.png" alt="Dashboard" width="500" />
+<img src="upload.png" alt="Upload Page" width="500" />
+<img src="canvas.png" alt="Editing Page" width="500" />
+<img src="colorize.png" alt="Colorize Page" width="500" />
 </div>
 
 ## Features
@@ -45,16 +42,7 @@ Many users want to restore or creatively enhance old black-and-white photos but 
 - **Backend:** Django
 - **Frontend:** HTML, CSS, custom stylesheets
 - **AI Model:** Pre-trained `colorization_release_v2.caffemodel` (Caffe framework)
-- **Database:** SQLite (for development) → PostgreSQL recommended for production
-
----
-
-##  Demo
-
-*(Replace these with your actual links once available!)*
-
-🌐 **Live Demo:** [Link here](#)  
-🎥 **Video Demo on YouTube:** [Watch Demo](#)
+- **Database:** SQLite
 
 ---
 
@@ -62,57 +50,45 @@ Many users want to restore or creatively enhance old black-and-white photos but 
 
 1. Clone the Repository
 git clone https://github.com/ataur-rehman/AI-Image-Colorizer.git
-cd prismify
 
-2. Create a Virtual Environment
-python -m venv venv
-source venv/bin/activate      # macOS / Linux
-venv\Scripts\activate         # Windows
+     cd prismify
 
-3. Install Dependencies
+2. Install Dependencies
 pip install -r requirements.txt
 
-4. Apply Migrations
+3. Apply Migrations
 python manage.py migrate
 
-5. Download the AI Model
+4. Download the AI Model
 Prismify uses the pre-trained Caffe model:
 
-Download:
+    Download:
+    colorization_release_v2.caffemodel
 
-colorization_release_v2.caffemodel (add your actual link here)
+    Place it in:
+    prismify/image_app/colorizer/
 
-Place it in:
-prismify/image_app/colorizer/
-
-6. Run the Development Server
+5. Run the Development Server
 python manage.py runserver
 Then visit:
 
-http://127.0.0.1:8000/
+    http://127.0.0.1:8000/
 
-📚 Resources & Documentation
-If you’re new to Django or AI colorization:
-
-Django Documentation
-
-Richard Zhang’s Colorization Model
-
-Python Virtual Environments
-
-🌱 Future Enhancements
+**🌱 Future Enhancements**
 Deployment to cloud platforms (e.g. Heroku, AWS)
 
-Support for additional editing effects
+1.Support for additional editing effects
 
-Batch processing of multiple images
+2.Batch processing of multiple images
 
-🙌 Acknowledgements
+**🙌 Acknowledgements**
+
 Colorization model by Richard Zhang et al.
 
 Django community for powerful web tools
 
 📬 Contact & Support
+
 💼 GitHub: https://github.com/ataur-rehman
 📩 Email: ataurrehman3636@gmail.com
 
