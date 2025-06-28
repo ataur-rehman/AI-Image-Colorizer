@@ -74,6 +74,8 @@ Then visit:
 
     http://127.0.0.1:8000/
 
+---
+
 **🌱 Future Enhancements**
 Deployment to cloud platforms (e.g. Heroku, AWS)
 
@@ -86,6 +88,8 @@ Deployment to cloud platforms (e.g. Heroku, AWS)
 Colorization model by Richard Zhang et al.
 
 Django community for powerful web tools
+
+---
 
 📬 Contact & Support
 
