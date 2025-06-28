@@ -19,8 +19,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*n1x(lx@s03s^p=iw(zrjc=is#8ys&&3*#n#l7=@3zws&=95b='
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -137,12 +135,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = 'ataurrehman0004@gmail.com'         # <-- your Gmail
-EMAIL_HOST_PASSWORD = "kohf ndrs jcga bvyn"    # <-- your 16-character app password
-
-
-"nozg cdvy niqu jhyn"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
