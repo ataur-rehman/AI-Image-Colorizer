@@ -10,12 +10,10 @@ The aim of Prismify is to simplify AI-driven image colorization for everyday use
 
 ## Screenshots
   <div style="display: flex; justify-content: space-between; gap: 20px;">
-<img src="home.png" alt="Home Page" width="400" />
-<img src="signup.png" alt="SignUp Page" width="400" />
 <img src="dashboard.png" alt="Dashboard" width="400" />
-<img src="upload.png" alt="Upload Page" width="400" />
-<img src="canvas.png" alt="Editing Page" width="400" />
-<img src="colorize.png" alt="Colorize Page" width="400" />
+<img src="invoiceForm.png" alt="Inovice Form" width="400" />
+<img src="inoviceDetail.png" alt="Invoice Detail" width="400" />
+<img src="dailyLedger.png" alt="Daily Ledger" width="400" />
 </div>
 
 
